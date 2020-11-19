@@ -1,0 +1,33 @@
+1. klient
+-soobchit code
+-name
+-id code
+
+
+
+
+2. schet
+-nomer scheta
+-col_vo deneg
+-soobschit col_vo deneg
+-polozhit -snyat
+-istoriya tranczakciy
+
+2.1. byn
+
+2.2 usd
+
+
+
+3. bankomat
+-adress
+-vcluchen -vicluchen
+-gotov -negotov
+-col_vo deneg
+-begin work
+-take money
+-giv money
+
+4. postoyanniy object
+-soxranit
+-izvlech
