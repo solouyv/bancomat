@@ -1,12 +1,14 @@
 #! /usr/bin/env python
 
-from decimal import Decimal as dec
+from decimal import Decimal as Dec
 from datetime import datetime
 
+
 class Account:
-    def __init__(self, number, amount=dec('0.00'), history={}, transaction=0):
+    def __init__(self, number, amount='0.00', history={}, 
+                                transaction=0):
         self.number = number
-        self.amount = amount
+        self.amount = Dec(amount)
         self.history = history
         self.transaction = transaction
 
@@ -24,15 +26,15 @@ class Account:
         time = datetime.now()
         self.transaction += 1
         self.history[self.transaction] = "-- {} -- Credited {} BYN".format(
-                                               time.strftime('%d-%m-%Y %H:%M:%S'), ather)
-        self.amount += dec(str(ather))
+                                    time.strftime('%d-%m-%Y %H:%M:%S'), ather)
+        self.amount += Dec(str(ather))
 
     def sub_amount(self, ather):
         time = datetime.now()
         self.transaction += 1
         self.history[self.transaction] = "-- {} -- Withdrawn {} BYN".format(
-                                               time.strftime('%d-%m-%Y %H:%M:%S'), ather)
-        self.amount -= dec(str(ather))
+                                    time.strftime('%d-%m-%Y %H:%M:%S'), ather)
+        self.amount -= Dec(str(ather))
 
 
 

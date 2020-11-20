@@ -1,10 +1,10 @@
 #! /usr/bin/env python
 
 class User:
-    def __init__(self, name, password, account):
+    def __init__(self, name, account, password):
         self.name = name
         self.password = password
-        self.account = str(account)
+        self.account = account
 
     def get_password(self):
         return self.password
@@ -13,7 +13,7 @@ class User:
         return self.account
         
     def __repr__(self):
-        return "{} {}".format(self.name, self.account)
+        return "User : {} {}".format(self.name, self.account)
 
 if __name__ == '__main__':
     a = User('Jone', '#$%ErT%$#', 12345)
