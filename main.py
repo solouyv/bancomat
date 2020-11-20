@@ -27,9 +27,12 @@ while bancomat.ready:
                 i = get_integer('How mach', minimum=5, 
                                             allow_zero=False, default=5)
                 if account.amount >= i:
-                    print('Take your maney.')
-                    account.sub_amount(i)
-                    bancomat.sub_amount(i)
+                    if bancomat.amount_money >=i:
+                        print('Take your maney.')
+                        account.sub_amount(i)
+                        bancomat.sub_amount(i)
+                    else:
+                        print(bancomat)
                 else:
                     print(account)
             elif choice in 'Cc':
