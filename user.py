@@ -1,18 +1,22 @@
 #! /usr/bin/env python
 
 class User:
-    def __init__(self, name, account, password):
-        self.name = name
-        self.password = password
-        self.account = account
+    '''
+    Класс пользователя
 
-    def get_password(self):
+    '''
+    def __init__(self, name, account, password):
+        self.name = name # имя пользователя
+        self.password = password # пароль доступа к счёту
+        self.account = account # номер счёта
+
+    def get_password(self): # возвращает пароль к счёту
         return self.password
-    
-    def get_account(self):
+
+    def get_account(self): # возвращает номер счёта
         return self.account
-        
-    def __repr__(self):
+
+    def __repr__(self): # возращает данные пользователя
         return "User : {} {}".format(self.name, self.account)
 
 if __name__ == '__main__':

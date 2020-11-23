@@ -24,7 +24,7 @@ while bancomat.ready:
         while True:
             choice = get_choice()
             if choice in 'Ww':
-                i = get_integer('How mach', minimum=5, 
+                i = get_integer('How mach', minimum=5,
                                             allow_zero=False, default=5)
                 if account.amount >= i:
                     if bancomat.amount_money >=i:
