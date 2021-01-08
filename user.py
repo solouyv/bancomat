@@ -1,29 +1,39 @@
 #! /usr/bin/env python
 
+
+class Card:
+    '''
+    Класс карточка
+
+    '''
+    def __init__(self, id, passwd):
+        self.id = id
+        self.passwd = passwd
+
+
 class User:
     '''
     Класс пользователя
 
     '''
-    def __init__(self, name, account, password):
-        self.name = name # имя пользователя
-        self.password = password # пароль доступа к счёту
-        self.account = account # номер счёта
+    def __init__(self, name, id, passwd):
+        self.name = name  # имя пользователя
+        self.card = Card(id, passwd)
 
-    def get_password(self): # возвращает пароль к счёту
-        return self.password
+    def get_passwd(self):  # возвращает пароль к карточке
+        return self.card.passwd
 
-    def get_account(self): # возвращает номер счёта
-        return self.account
+    def get_card_id(self):  # возвращает id карточки
+        return self.card.id
 
-    def __repr__(self): # возращает данные пользователя
-        return "User : {} {}".format(self.name, self.account)
+    def __repr__(self):  # возращает данные пользователя
+        return "User : {} {}".format(self.name, self.card.id)
+
 
 if __name__ == '__main__':
-    a = User('Jone', '#$%ErT%$#', 12345)
+    a = User('Jone', '1938479018734987', 12345)
     print(a)
     for key in a.__dict__:
         print(key, a.__dict__[key])
-    print(a.get_account())
-    print(a.get_password())
-
+    print(a.get_card_id())
+    print(a.get_passwd())
