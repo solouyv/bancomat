@@ -1,77 +1,107 @@
-#! /usr/bin/env pytho
+#!/usr/bin/env python
 
-import shelve
 import uuid
 from decimal import Decimal as Dec
 from datetime import datetime
 
+from account import User, Card, Account
 
-def save(func):
-    '''
-    декоратор для:
-        - увеличения номера транзакции
-        - сохранения операции в истории
-        - сохранения состояния банкомата на диске
 
-    '''
-    def wraper(*arg, **kvarg):
-        time = datetime.now()
-        func(*arg, **kvarg)
-        self_ = arg[0]
-        self_.transaction += 1
-        self_.history[self_.transaction] = (self_.bancomat_id, time.strftime(
-            '%d-%m-%Y %H:%M:%S'), self_.amount_money)
-        with shelve.open('bancomatdb') as db:
-            db[self_.address] = self_
-        return func
-    return wraper
+# def save(func):
+#     '''
+#     декоратор для:
+#         - увеличения номера транзакции
+#         - сохранения операции в истории
+#         - сохранения состояния банкомата на диске
+
+#     '''
+#     def wraper(*arg, **kvarg):
+#         time = datetime.now()
+#         func(*arg, **kvarg)
+#         self_ = arg[0]
+#         self_.transaction += 1
+#         self_.history[self_.transaction] = (self_.bancomat_id, time.strftime(
+#             '%d-%m-%Y %H:%M:%S'), self_.amount_money)
+#         with shelve.open('bancomatdb') as db:
+#             db[self_.address] = self_
+#         return func
+#     return wraper
 
 
 class Bancomat:
-    def __init__(self, address, bancomat_id=str(uuid.uuid4()),
-                 amount_money=Dec(1E+7), on_off='on',
-                 transaction=0, history={}):
-        self.bancomat_id = bancomat_id  # уникальный номер банкомата
-        self.address = address  # адрес банкомата
-        self.amount_money = amount_money  # количество денег в банкомате
-        # при первом запуске
-        self.on_off = on_off  # состояние включен выключен
-        self.transaction = transaction  # номер операции банкомата
-        self.history = history  # история операций банкомата
+    '''Класс банкомат
+
+    bancomat_id - уникальный номер банкомата
+    amount_money - количество денег в банкомате
+    transaction - порядковый номер для транкзакций банкомата
+    history - история операций в банкомате
+    address - адресс установки банкомата
+    '''
+
+    def __init__(self, bancomat_id=str(uuid.uuid4()),
+                 amount_money=Dec(1E+7), transaction=0, history={}):
+        self.bancomat_id = bancomat_id
+        self.amount_money = amount_money
+        self.transaction = transaction
+        self.history = history
+        self.address = ''
 
     def __repr__(self):
-        return 'Bancomat : {} \n{} -- {} BYN'.format(self.bancomat_id,
-                                                     self.address,
-                                                     self.amount_money)
+        return 'Bancomat : {} \n\t{} -- {} BYN'.format(self.bancomat_id,
+                                                       self.address,
+                                                       self.amount_money)
 
-    @save
-    def add_amount(self, ather):  # добавление денег в банкомат
-        self.amount_money += Dec(ather)
+    def authentication(self):
+        '''Метод производящий аутентификацию'''
+        attempt = 3
+        print('Вставте карточку')
+        _card = card  # экземпляр обьекта Card будет считан с карточки
+        while attempt > 0:
+            passwd = input('Введите пин-код')
+            if _card.passwd == passwd:
+                return _card.id
+            else:
+                attempt -= 1
+                print('Осталось {} {}'.format(
+                    attempt, 'попытки' if attempt > 1 else 'попытка'))
+        return None
 
-    @save
-    def sub_amount(self, ather):  # снятие денег из банкомата
-        self.amount_money -= Dec(ather)
-
-    def start(self):
-        '''
-        включение банкомата
-        '''
-        with shelve.open('bancomatdb') as db:
-            a = db[self.address]
-        a.on_off = "on"
-        return a
-
-    def stop(self):
-        '''
-        выключение банкомата с сохранением состояния на диске
-        '''
-        with shelve.open('bancomatdb') as db:
-            self.on_off = "off"
-            db[self.address] = self
+    def start(self, address, money=None):
+        '''Включение банкомата'''
+        self.address = address
+        if money:
+            self.amount_money = money
+        card_id = self.authentication()
+        if card_id:
+            choice = get_choice()
+        if choice in 'Ww':
+            i = get_integer('How mach', minimum=5,
+                                        allow_zero=False, default=5)
+            if account.amount >= i:
+                if bancomat.amount_money >=i:
+                    print('Take your maney.')
+                    account.sub_amount(i)
+                    bancomat.sub_amount(i)
+                else:
+                    print(bancomat)
+            else:
+                print(account)
+        elif choice in 'Cc':
+            print('Put your money.')
+            account.add_amount(5)
+            bancomat.add_amount(5)
+        elif choice in 'Gg':
+            print(account)
+        elif choice in 'Ss':
+            account.get_history()
+        else:
+            break
 
 
 if __name__ == '__main__':
-    a = Bancomat('Mogilev Yacubovskogo 66')
-    for key in a.history:
-        print(key, a.history[key])
+    a = User('Mike Doe')
+    a.get_card()
+    print(a)
+    a = Bancomat()
+    a.start('Mogilev Jacubovskogo 66')
     print(a)

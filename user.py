@@ -6,8 +6,8 @@ class Card:
     Класс карточка
 
     '''
-    def __init__(self, id, passwd):
-        self.id = id
+    def __init__(self, id_, passwd):
+        self.id = id_
         self.passwd = passwd
 
 
@@ -16,9 +16,9 @@ class User:
     Класс пользователя
 
     '''
-    def __init__(self, name, id, passwd):
+    def __init__(self, name, id_, passwd):
         self.name = name  # имя пользователя
-        self.card = Card(id, passwd)
+        self.card = Card(id_, passwd)
 
     def get_passwd(self):  # возвращает пароль к карточке
         return self.card.passwd
