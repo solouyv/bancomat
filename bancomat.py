@@ -4,28 +4,8 @@ import uuid
 from decimal import Decimal as Dec
 from datetime import datetime
 
-from account import User, Card, Account
-
-
-# def save(func):
-#     '''
-#     декоратор для:
-#         - увеличения номера транзакции
-#         - сохранения операции в истории
-#         - сохранения состояния банкомата на диске
-
-#     '''
-#     def wraper(*arg, **kvarg):
-#         time = datetime.now()
-#         func(*arg, **kvarg)
-#         self_ = arg[0]
-#         self_.transaction += 1
-#         self_.history[self_.transaction] = (self_.bancomat_id, time.strftime(
-#             '%d-%m-%Y %H:%M:%S'), self_.amount_money)
-#         with shelve.open('bancomatdb') as db:
-#             db[self_.address] = self_
-#         return func
-#     return wraper
+import console
+from account import Account, Bank
 
 
 class Bancomat:
@@ -53,11 +33,13 @@ class Bancomat:
 
     def authentication(self):
         '''Метод производящий аутентификацию'''
+
         attempt = 3
-        print('Вставте карточку')
-        _card = card  # экземпляр обьекта Card будет считан с карточки
+        input('Вставте карточку нажмите ок')
+        # _card = card  # экземпляр обьекта Card будет считан с карточки
+        _card = self.bank.accounts[list(self.bank.accounts.keys())[0]].card
         while attempt > 0:
-            passwd = input('Введите пин-код')
+            passwd = input('Введите пин-код: ')
             if _card.passwd == passwd:
                 return _card.id
             else:
@@ -66,42 +48,60 @@ class Bancomat:
                     attempt, 'попытки' if attempt > 1 else 'попытка'))
         return None
 
-    def start(self, address, money=None):
-        '''Включение банкомата'''
+    def sub_amount(self, account,  other):
+        '''Метод для:
+            - увеличения номера транзакции
+            - записи транзакции в историю
+            - уменьшения количества наличных банкомата
+
+        account - кто снимает деньги
+        other - количесво снятых денег'''
+
+        time = datetime.now()
+        self.transaction += 1
+        self.history[self.transaction] = "{} -- {} -- Withdrawn {} BYN".format(
+            account.user.name, time.strftime('%d-%m-%Y %H:%M:%S'), other)
+        self.amount_money -= Dec(other)
+
+    def start(self, bank, address, money=None):
+        '''Алгоритм работы банкомата'''
+
         self.address = address
+        self.bank = bank
         if money:
             self.amount_money = money
-        card_id = self.authentication()
-        if card_id:
-            choice = get_choice()
-        if choice in 'Ww':
-            i = get_integer('How mach', minimum=5,
-                                        allow_zero=False, default=5)
-            if account.amount >= i:
-                if bancomat.amount_money >=i:
-                    print('Take your maney.')
-                    account.sub_amount(i)
-                    bancomat.sub_amount(i)
-                else:
-                    print(bancomat)
-            else:
-                print(account)
-        elif choice in 'Cc':
-            print('Put your money.')
-            account.add_amount(5)
-            bancomat.add_amount(5)
-        elif choice in 'Gg':
-            print(account)
-        elif choice in 'Ss':
-            account.get_history()
-        else:
-            break
+        while True:
+            card_id = self.authentication()
+            if card_id:
+                while True:
+                    account = bank.accounts[card_id]
+                    choice = console.get_choice()
+                    if choice in 'Ww':
+                        i = console.get_integer('How mach', minimum=5,
+                                                allow_zero=False, default=5)
+                        if account.amount >= i:
+                            if self.amount_money >= i:
+                                print('Take your maney.')
+                                account.sub_amount(self.address, i)
+                                self.sub_amount(account, i)
+                            else:
+                                print(self)
+                        else:
+                            print(account)
+                    elif choice in 'Gg':
+                        print(account)
+                    elif choice in 'Ss':
+                        account.get_history()
+                    else:
+                        break
 
 
 if __name__ == '__main__':
-    a = User('Mike Doe')
-    a.get_card()
+    a = Account('Mike Doe', amount=100)
     print(a)
-    a = Bancomat()
-    a.start('Mogilev Jacubovskogo 66')
-    print(a)
+    c = Bank()
+    c.add_account(a)
+    print(c)
+    b = Bancomat()
+    print(b)
+    b.start(c, 'Mogilev Jacubovskogo 66')

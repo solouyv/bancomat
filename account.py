@@ -3,14 +3,15 @@
 import uuid
 import random
 from decimal import Decimal as Dec
+from datetime import datetime
 
 
 class Card:
-    r'''Класс карточка
+    '''Класс карточка
 
     id - уникальный номер карточки
-    passwd - пин-код доступа
-    '''
+    passwd - пин-код доступа'''
+
     def __init__(self):
         self.id = str(uuid.uuid4())
         self.passwd = '{0:0>4}'.format(random.randrange(0, 10000))
@@ -20,75 +21,74 @@ class Card:
 
 
 class Account:
-    r'''Класс счёт в банке
+    '''Класс счёт в банке
 
     number - уникальный номер для счёта
     amount - количество денег на счету
     history - история изменения счёта
     transaction - порядковый номер для очередной транзакции
-    '''
-    def __init__(self, number=uuid.uuid4(), amount='0.00', history={},
+    user - владелец счета
+    card - карточка счета'''
+
+    def __init__(self, name, number=uuid.uuid4(), amount='0.00', history={},
                  transaction=0):
+        self.user = User(name)
+        self.card = Card()
         self.number = number
         self.amount = Dec(amount)
         self.history = history
         self.transaction = transaction
 
     def __repr__(self):
-        return "Account: {} : {} BYN".format(self.number, self.amount)
+        return ("Account: \n\t{}\n\tNumber {}"
+                "\n\tPin {} \n\tAmount {} BYN").format(
+                    self.user, self.number, self.card.passwd, self.amount)
 
-    def issue_card(self):
-        '''Выпуск карточки по запросу пользователя
+    def get_history(self):
+        '''Вывод истории изменения счёта'''
 
-        card - экземпляр о карточка
-        '''
-        self.card = Card()
-        return self.card
+        for key in self.history:
+            print(key, self.history[key])
 
-    # def get_amount(self):
-    #     '''Вывод текущего остатка счёта'''
-    #     return self.amount
+    def sub_amount(self, address, ather):
+        '''Метод для:
+            - увеличения транзакции
+            - записи транзакции в историю
+            - вычитания суммы снатых наличных со счёта'''
 
-    # def get_history(self):  # вывод истории транзакций
-    #     for key in self.history:
-    #         print(key, self.history[key])
-
-    # def add_amount(self, ather):  # добавление денег на счёт
-    #     time = datetime.now()
-    #     self.transaction += 1  # номер транзакции
-    #     self.history[self.transaction] = "-- {} -- Credited {} BYN".format(
-    #                  time.strftime('%d-%m-%Y %H:%M:%S'), ather)
-    #     # добавление транзакции в историю счёта
-    #     self.amount += Dec(str(ather))  # добавление денег на счёт
-
-    # def sub_amount(self, ather):  # снятие денег со счёта ()
-    #     time = datetime.now()
-    #     self.transaction += 1
-    #     self.history[self.transaction] = "-- {} -- Withdrawn {} BYN".format(
-    #                  time.strftime('%d-%m-%Y %H:%M:%S'), ather)
-    #     self.amount -= Dec(str(ather))
+        time = datetime.now()
+        self.transaction += 1
+        self.history[self.transaction] = "{} -- {} -- Withdrawn {} BYN".format(
+                     address, time.strftime('%d-%m-%Y %H:%M:%S'), ather)
+        self.amount -= Dec(ather)
 
 
 class User:
     '''Класс пользователя
 
     name - имя пользователя
-    account - экземпляр обьекта счёт в банке
-    '''
+    и др. данные пользователя'''
+
     def __init__(self, name):
         self.name = name
-        self.account = Account()
-
-    def get_card(self):
-        '''Получение карточки к счёту'''
-        self.card = self.account.issue_card()
 
     def __repr__(self):
-        return "User : \n\tName: {}\n\t{}\n\t{}".format(
-            self.name, self.account, self.card)
+        return "User : {}".format(self.name)
+
+
+class Bank:
+    def __init__(self):
+        self.accounts = {}
+
+    def add_account(self, account):
+        self.accounts[account.card.id] = account
+
+    def __repr__(self):
+        return 'Bank: {}'.format(self.accounts)
 
 
 if __name__ == "__main__":
-    a = User('Mike Doe')
-    a.get_card()
-    print(a)
+    a = Account('Mike Doe', amount=100)
+    b = Bank()
+    b.add_account(a)
+    print(b)
